@@ -1,0 +1,3 @@
+cd /d/Projects/phishing_project/Phishing-Email-Detection-Using-DL/url
+source /d/Projects/phishing_project/.venv/Scripts/activate
+python predict.py
