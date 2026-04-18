@@ -55,16 +55,17 @@ if __name__ == "__main__":
 
     final_result = result
 
-    if urls:
-        print("\n🔎 URL Analysis:")
-        for url in urls:
-            url_result = predict_url(url)
-            print("URL:", url)
-            print("URL Prediction:", url_result)
+final_result = result
 
-            if url_result == 1:
-                final_result = "Phishing Email"
-    else:
-        print("\nNo URLs found in email.")
+if urls:
+    print("\n🔎 URL Analysis:")
+    for url in urls:
+        url_result = predict_url(url)
+        print("URL:", url)
+        print("URL Prediction:", url_result)
 
-    print("\n🚨 Final Decision:", final_result)
+        if url_result == -1:
+            final_result = "Phishing Email"
+            break
+
+print("\n🚨 Final Decision:", final_result)
