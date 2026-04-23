@@ -1,17 +1,24 @@
+import os
+import warnings
 import pickle
 import sys
 
-import numpy as np
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+warnings.filterwarnings("ignore")
+
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+
 from url.extract import extract_urls
-from url.feature import FeatureExtraction
+from url.predict import predict_url
+
+BASE_DIR = os.path.dirname(__file__)
 
 # Load model and tools
-model = load_model("email_model.h5")
-tokenizer = pickle.load(open("models/tokenizer.pkl", "rb"))
-label_encoder = pickle.load(open("models/label_encoder.pkl", "rb"))
-url_model = pickle.load(open("url/newmodel.pkl", "rb"))
+model = load_model(os.path.join(BASE_DIR, "email_model.h5"))
+tokenizer = pickle.load(open(os.path.join(BASE_DIR, "models", "tokenizer.pkl"), "rb"))
+label_encoder = pickle.load(open(os.path.join(BASE_DIR, "models", "label_encoder.pkl"), "rb"))
+
 MAX_LEN = 150
 
 
@@ -28,15 +35,9 @@ def predict_email(text):
     confidence = prob if label_index == 1 else 1 - prob
 
     return label, confidence
-def predict_url(url):
-    obj = FeatureExtraction(url)
-    features = obj.features
-    features = np.array(features).reshape(1, -1)
 
-    prediction = url_model.predict(features)
-    return prediction[0]
+
 if __name__ == "__main__":
-
     print("📩 Email Phishing Detector")
     print("Paste FULL email. When finished press Ctrl+Z then Enter\n")
 
@@ -49,23 +50,28 @@ if __name__ == "__main__":
     print("Confidence:", round(probability * 100, 2), "%")
     print("==========================\n")
 
-    # 👇 مهم: هذا لازم يكون موجود
     urls = extract_urls(user_input)
     print("Extracted URLs:", urls)
-
-    final_result = result
 
 final_result = result
 
 if urls:
     print("\n🔎 URL Analysis:")
+    url_decisions = []
+
     for url in urls:
         url_result = predict_url(url)
         print("URL:", url)
         print("URL Prediction:", url_result)
+        url_decisions.append(str(url_result))
 
-        if url_result == -1:
-            final_result = "Phishing Email"
-            break
+    # URL has priority only if URLs exist
+    if any("Phishing" in decision for decision in url_decisions):
+        final_result = "Phishing Email"
+    elif all("Safe" in decision for decision in url_decisions):
+        final_result = "Safe Email"
+else:
+    # no URLs -> rely on email model
+    final_result = result
 
 print("\n🚨 Final Decision:", final_result)
