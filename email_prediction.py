@@ -1,17 +1,16 @@
 import os
+import sys
 import warnings
 import pickle
-import sys
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-warnings.filterwarnings("ignore")
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
+sys.path.append(PROJECT_ROOT)
 
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 from url.extract import extract_urls
 from url.predict import predict_url
-
 BASE_DIR = os.path.dirname(__file__)
 
 # Load model and tools

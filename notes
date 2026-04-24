@@ -1,3 +1,0 @@
-
-source /d/Projects/phishing_project/.venv/Scripts/activate
-python predict.py
