@@ -38,9 +38,22 @@ def predict_email(text):
 
 if __name__ == "__main__":
     print("📩 Email Phishing Detector")
-    print("Paste FULL email. When finished press Ctrl+Z then Enter\n")
+    print("Choose input method:")
+    print("1. Paste email text")
+    print("2. Analyze OCR extracted text file")
 
-    user_input = sys.stdin.read()
+    choice = input("Enter choice (1 or 2): ")
+
+    if choice == "2":
+        ocr_file_path = r"D:\Projects\phishing_project\extracted_email_text.txt"
+
+        with open(ocr_file_path, "r", encoding="utf-8") as file:
+            user_input = file.read()
+
+        print("\n✅ OCR text loaded successfully.")
+    else:
+        print("\nPaste FULL email. When finished press Ctrl+Z then Enter\n")
+        user_input = sys.stdin.read()
 
     result, probability = predict_email(user_input)
 
@@ -52,25 +65,21 @@ if __name__ == "__main__":
     urls = extract_urls(user_input)
     print("Extracted URLs:", urls)
 
-final_result = result
-
-if urls:
-    print("\n🔎 URL Analysis:")
-    url_decisions = []
-
-    for url in urls:
-        url_result = predict_url(url)
-        print("URL:", url)
-        print("URL Prediction:", url_result)
-        url_decisions.append(str(url_result))
-
-    # URL has priority only if URLs exist
-    if any("Phishing" in decision for decision in url_decisions):
-        final_result = "Phishing Email"
-    elif all("Safe" in decision for decision in url_decisions):
-        final_result = "Safe Email"
-else:
-    # no URLs -> rely on email model
     final_result = result
 
-print("\n🚨 Final Decision:", final_result)
+    if urls:
+        print("\n🔎 URL Analysis:")
+        url_decisions = []
+
+        for url in urls:
+            url_result = predict_url(url)
+            print("URL:", url)
+            print("URL Prediction:", url_result)
+            url_decisions.append(str(url_result))
+
+        if any("Phishing" in decision for decision in url_decisions):
+            final_result = "Phishing Email"
+        elif all("Safe" in decision for decision in url_decisions):
+            final_result = "Safe Email"
+
+    print("\n🚨 Final Decision:", final_result)
