@@ -1,0 +1,14 @@
+source /d/Projects/phishing_project/.venv/Scripts/activate
+cd /d/Projects/phishing_project/Phishing-Email-Detection-Using-DL
+python app.py
+
+
+python predict.py
+ cd spam-Detection
+  cd url
+  cd ..
+  cd /d/Projects/phishing_project/Phishing-Email-Detection-Using-DL
+  python email_prediction.py
+  test pii page _ python
+  from preprocess import debug_pii_filter
+  print(debug_pii_filter("https://accounts.google.com"))
