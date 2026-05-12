@@ -10,10 +10,14 @@ except ImportError:
     from preprocess import pii_filter, blacklist_check, resolve_redirects
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "newmodel.pkl")
 
-with open("model.pkl", "rb") as file:
+#with open("newmodel.pkl", "rb") as file:
+   # gbc = pickle.load(file)
+
+
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "newmodel.pkl")
+
+with open(MODEL_PATH, "rb") as file:
     gbc = pickle.load(file)
-
-
 def predict_url(url):
     if not url.startswith(("http://", "https://")):
         url = "http://" + url
