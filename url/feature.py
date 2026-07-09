@@ -474,7 +474,9 @@ class FeatureExtraction:
         try:
             url_match = re.search(
                 'at\.ua|usa\.cc|baltazarpresentes\.com\.br|pe\.hu|esy\.es|hol\.es|sweddy\.com|myjino\.ru|96\.lt|ow\.ly',
-                url)
+
+
+               url)
             ip_address = socket.gethostbyname(self.domain)
             ip_match = re.search(
                 '146\.112\.61\.108|213\.174\.157\.151|121\.50\.168\.88|192\.185\.217\.116|78\.46\.211\.158|181\.174\.165\.13|46\.242\.145\.103|121\.50\.168\.40|83\.125\.22\.219|46\.242\.145\.98|'

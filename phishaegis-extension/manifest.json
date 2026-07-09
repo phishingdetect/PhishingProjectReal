@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "PhishAegis URL Scanner",
+  "version": "1.0",
+  "description": "Scan current webpage URL using PhishAegis.",
+  "permissions": ["tabs", "activeTab"],
+  "host_permissions": [
+    "https://phishingdetect-phish-aegis-api.hf.space/*"
+  ],
+  "action": {
+    "default_title": "PhishAegis Scanner",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+  "16": "phishaegis-logo.jpg",
+  "48": "phishaegis-logo.jpg",
+  "128": "phishaegis-logo.jpg"
+}
+}

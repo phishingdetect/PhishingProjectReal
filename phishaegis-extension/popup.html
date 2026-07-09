@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 340px;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.25), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.18), transparent 35%),
+        #020617;
+      color: #ffffff;
+      padding: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    h2 span {
+      color: #38bdf8;
+    }
+
+    .subtitle {
+      margin: 2px 0 0;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .status-card {
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+      color: #020617;
+      font-weight: 800;
+      cursor: pointer;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.25);
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .box {
+      background: rgba(30, 41, 59, 0.86);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      padding: 11px;
+      margin-top: 10px;
+      border-radius: 14px;
+      word-break: break-word;
+      font-size: 13px;
+    }
+
+    .label {
+      color: #94a3b8;
+      font-size: 11px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .value {
+      color: #e5e7eb;
+      line-height: 1.4;
+    }
+
+    .high {
+      color: #fb7185;
+      font-weight: 800;
+    }
+
+    .low {
+      color: #4ade80;
+      font-weight: 800;
+    }
+
+    .medium {
+      color: #fbbf24;
+      font-weight: 800;
+    }
+
+    .footer {
+      margin-top: 12px;
+      text-align: center;
+      color: #64748b;
+      font-size: 11px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="brand">
+    <img src="phishaegis-logo.jpg" class="logo">
+
+    <div>
+        <h2>Phish<span>Aegis</span></h2>
+        <p class="subtitle">AI-Powered URL Protection</p>
+    </div>
+</div>
+
+  <div class="status-card">
+    <button id="scanBtn">Scan Current Page</button>
+
+    <div class="box">
+      <div class="label">Current URL</div>
+      <div id="urlText" class="value">-</div>
+    </div>
+
+    <div class="box">
+      <div class="label">Prediction</div>
+      <div id="predictionText" class="value">Waiting...</div>
+    </div>
+
+    <div class="box">
+      <div class="label">Final Decision</div>
+      <div id="finalText" class="value">-</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Multi-Channel Phishing Defense
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

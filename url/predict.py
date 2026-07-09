@@ -2,22 +2,21 @@ import os
 import pickle
 import pandas as pd
 import joblib
+
 try:
     from .feature import FeatureExtraction
     from .preprocess import pii_filter, blacklist_check, resolve_redirects
 except ImportError:
     from feature import FeatureExtraction
     from preprocess import pii_filter, blacklist_check, resolve_redirects
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "newmodel.pkl")
-
-#with open("newmodel.pkl", "rb") as file:
-   # gbc = pickle.load(file)
 
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "newmodel.pkl")
 
 with open(MODEL_PATH, "rb") as file:
     gbc = pickle.load(file)
+
+
 def predict_url(url):
     if not url.startswith(("http://", "https://")):
         url = "http://" + url
@@ -37,6 +36,12 @@ def predict_url(url):
     # 3) URL redirections check
     final_url = resolve_redirects(url)
     print(f"Final URL after redirection check: {final_url}")
+
+    #404 redirect rule
+    final_url_lower = final_url.lower()
+    if "404.php" in final_url_lower or final_url_lower.endswith("/404"):
+        print("404 RULE HIT - skipping ML model")
+        return "Phishing ❌ (Suspicious redirect to 404 page)"
 
     # 4) Feature data extraction
     obj = FeatureExtraction(final_url)

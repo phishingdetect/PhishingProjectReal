@@ -1,4 +1,4 @@
-const tabButtons = document.querySelectorAll(".tab-btn");
+ const tabButtons = document.querySelectorAll(".tab-btn");
 const tabContents = document.querySelectorAll(".tab-content");
 
 const loadingBox = document.getElementById("loadingBox");
@@ -139,21 +139,39 @@ function updateResult(data, channelName) {
 
   updateGauge(riskScore);
 
-  resultChannel.textContent = channelName || data.channel || "-";
-  resultPrediction.textContent = getPrediction(data);
-  resultConfidence.textContent = getConfidence(data);
-  resultFinal.textContent = finalDecision;
 
-  resultUrls.textContent = safeJson(data.extracted_urls);
-  resultUrlAnalysis.textContent = safeJson(data.url_analysis);
+resultChannel.textContent = channelName || data.channel || "-";
+resultPrediction.textContent = getPrediction(data);
+resultConfidence.textContent = getConfidence(data);
+resultFinal.textContent = finalDecision;
 
-  resultRawText.textContent =
-    data.extracted_ocr_text ||
-    data.raw_ocr_text ||
-    data.input_text ||
-    data.message ||
-    "-";
+/* URLs */
+if (Array.isArray(data.extracted_urls)) {
+  resultUrls.textContent = data.extracted_urls.join("\n");
+} else {
+  resultUrls.textContent = data.extracted_urls || "-";
+}
 
+/* URL Analysis */
+if (Array.isArray(data.url_analysis)) {
+  resultUrlAnalysis.textContent = data.url_analysis
+    .map(item => {
+      const url = item.url || "-";
+      const prediction = item.prediction || "-";
+      return `${url} → ${prediction}`;
+    })
+    .join("\n");
+} else {
+  resultUrlAnalysis.textContent = data.url_analysis || "-";
+}
+
+/* OCR Text */
+resultRawText.textContent =
+  data.extracted_ocr_text ||
+  data.raw_ocr_text ||
+  data.input_text ||
+  data.message ||
+  "-";
   resultBox.classList.remove("hidden");
   resultBox.scrollIntoView({ behavior: "smooth", block: "start" });
 }

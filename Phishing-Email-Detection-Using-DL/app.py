@@ -1,13 +1,12 @@
 import os
-import os
 
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
-
 import sys
 import subprocess
 import importlib.util
+import re
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 
@@ -18,7 +17,6 @@ URL_DIR = os.path.join(PROJECT_ROOT, "url")
 SMS_DIR = os.path.join(PROJECT_ROOT, "spam-Detection")
 SMS_FILE = os.path.join(SMS_DIR, "sms_prediction.py")
 
-OCR_PYTHON = os.path.join(PROJECT_ROOT, ".venv1", "Scripts", "python.exe")
 OCR_SCRIPT = os.path.join(PROJECT_ROOT, "ocr_bridge.py")
 
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
@@ -30,6 +28,7 @@ sys.path.append(URL_DIR)
 from email_prediction import predict_email
 from url.predict import predict_url
 from url.extract import extract_urls
+
 
 def load_sms_module():
     old_cwd = os.getcwd()
@@ -51,6 +50,7 @@ app = Flask(
     static_folder=os.path.join(PROJECT_ROOT, "static")
 )
 CORS(app)
+
 
 def to_float(value):
     try:
@@ -75,7 +75,7 @@ def analyze_url_logic(url):
         "final_decision": final_decision,
         "risk_level": risk_level
     }
-import re
+
 
 def normalize_ocr_text_for_urls(text):
     if not text:
@@ -83,7 +83,6 @@ def normalize_ocr_text_for_urls(text):
 
     fixed = text
 
-    # Fix common OCR mistakes in protocol
     fixed = fixed.replace("bttp", "http")
     fixed = fixed.replace("Bttp", "http")
     fixed = fixed.replace("hxxp", "http")
@@ -96,13 +95,11 @@ def normalize_ocr_text_for_urls(text):
     fixed = fixed.replace("http //", "http://")
     fixed = fixed.replace("https //", "https://")
 
-    # Fix common OCR mistakes in www
     fixed = fixed.replace("Iww", "www")
     fixed = fixed.replace("lww", "www")
     fixed = fixed.replace("Www", "www")
     fixed = fixed.replace("wwtrusted", "www.trusted")
 
-    # Fix spaced domains
     fixed = fixed.replace(" dot ", ".")
     fixed = fixed.replace(" .com", ".com")
     fixed = fixed.replace(" com ", ".com ")
@@ -110,7 +107,6 @@ def normalize_ocr_text_for_urls(text):
     fixed = fixed.replace(" comgeneral", ".com/general")
     fixed = fixed.replace(".comgeneral", ".com/general")
 
-    # Fix cases like trustedbank comgeneral...
     fixed = re.sub(
         r"\b([A-Za-z0-9-]+)\s+com([A-Za-z0-9_/.-]+)",
         r"\1.com/\2",
@@ -118,7 +114,6 @@ def normalize_ocr_text_for_urls(text):
         flags=re.IGNORECASE
     )
 
-    # Fix cases like http://wwwtrustedbank.com -> http://www.trustedbank.com
     fixed = re.sub(
         r"(https?://)www([A-Za-z0-9-]+\.)",
         r"\1www.\2",
@@ -126,7 +121,6 @@ def normalize_ocr_text_for_urls(text):
         flags=re.IGNORECASE
     )
 
-    # Fix missing dot before asp/php/html
     fixed = re.sub(
         r"([A-Za-z0-9_-])(asp|php|html)(\s|$)",
         r"\1.\2 ",
@@ -134,7 +128,6 @@ def normalize_ocr_text_for_urls(text):
         flags=re.IGNORECASE
     )
 
-    # Fix cases like infoaspOnce -> info.asp Once
     fixed = re.sub(
         r"([A-Za-z0-9_-])asp(Once|If|Thank|This|We|Member|Please|Failure)",
         r"\1.asp \2",
@@ -142,7 +135,6 @@ def normalize_ocr_text_for_urls(text):
         flags=re.IGNORECASE
     )
 
-    # Put space after common file endings if OCR glued next sentence
     fixed = re.sub(
         r"(\.(asp|php|html|htm|aspx))([A-Z][a-z]+)",
         r"\1 \3",
@@ -150,7 +142,6 @@ def normalize_ocr_text_for_urls(text):
         flags=re.IGNORECASE
     )
 
-    # If domain appears without protocol, add http://
     fixed = re.sub(
         r"(?<!://)\b((?:www\.)?[A-Za-z0-9-]+\.(?:com|net|org|co|io|info|biz)(?:/[A-Za-z0-9_\-./?=&%]*)?)",
         r"http://\1",
@@ -158,7 +149,6 @@ def normalize_ocr_text_for_urls(text):
         flags=re.IGNORECASE
     )
 
-    # Stop URL when OCR attaches normal sentence words after link
     stop_words = [
         "Once", "Thank", "Thankyou", "This", "Please", "If",
         "We", "Member", "Dear", "Failure", "Security", "Billing"
@@ -172,12 +162,11 @@ def normalize_ocr_text_for_urls(text):
             flags=re.IGNORECASE
         )
 
-    # Clean duplicated protocols
     fixed = fixed.replace("http://http://", "http://")
     fixed = fixed.replace("https://https://", "https://")
     fixed = fixed.replace("http://securehttp://-login", "http://secure-login")
     fixed = fixed.replace("https://securehttps://-login", "https://secure-login")
-    # Fix duplicated www + protocol mistakes
+
     fixed = fixed.replace("www.http://", "http://")
     fixed = fixed.replace("www.https://", "https://")
     fixed = fixed.replace("http://www.http://", "http://")
@@ -185,20 +174,21 @@ def normalize_ocr_text_for_urls(text):
     fixed = fixed.replace("http://www.https://", "https://")
     fixed = fixed.replace("https://www.http://", "http://")
 
-    # Fix OCR reading bttp lww... as http://www...
     fixed = fixed.replace("http://lww", "http://www")
     fixed = fixed.replace("http://Iww", "http://www")
     fixed = fixed.replace("https://lww", "https://www")
     fixed = fixed.replace("https://Iww", "https://www")
 
-    # If OCR produced http://wwwtrustedbank.com, add dot after www
     fixed = re.sub(
         r"(https?://)www([A-Za-z0-9-]+\.(com|net|org|co|io|info|biz))",
         r"\1www.\2",
         fixed,
         flags=re.IGNORECASE
     )
+
     return fixed
+
+
 def analyze_email_logic(text):
     email_label, email_confidence = predict_email(text)
 
@@ -271,7 +261,7 @@ def analyze_sms_logic(text):
 
 def extract_text_with_ocr(image_path):
     process = subprocess.run(
-        [OCR_PYTHON, OCR_SCRIPT, image_path],
+        [sys.executable, OCR_SCRIPT, image_path],
         capture_output=True,
         text=True
     )
@@ -347,6 +337,7 @@ def predict_image_email_route():
         analysis["channel"] = "Image Email"
         analysis["raw_ocr_text"] = raw_ocr_text
         analysis["extracted_ocr_text"] = normalized_text
+
         return jsonify(analysis)
 
     finally:
